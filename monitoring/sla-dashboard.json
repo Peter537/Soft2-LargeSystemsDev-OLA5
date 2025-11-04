@@ -1,0 +1,79 @@
+{
+    "__inputs": [],
+    "id": null,
+    "title": "MTOGO SLA Dashboard",
+    "tags": [
+        "sla",
+        "orders"
+    ],
+    "style": "dark",
+    "timezone": "browser",
+    "panels": [
+        {
+            "id": 1,
+            "title": "Uptime (99.5% SLO)",
+            "type": "stat",
+            "targets": [
+                {
+                    "expr": "avg_over_time(up{job=\"order-service\"}[30d]) * 100",
+                    "datasource": {
+                        "uid": "prometheus"
+                    }
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "thresholds": {
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 0
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "id": 2,
+            "title": "Order Placement Latency Histogram",
+            "type": "histogram",
+            "targets": [
+                {
+                    "expr": "sum(rate(http_request_duration_seconds_bucket{job='order-service'}[5m])) by (le)",
+                    "datasource": {
+                        "uid": "prometheus"
+                    }
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "title": "Error Budget Burn (Monthly)",
+            "type": "stat",
+            "targets": [
+                {
+                    "expr": "(1 - (sum(increase(http_requests_failed_total[30d])) / sum(increase(http_requests_total[30d])))) * 100",
+                    "datasource": {
+                        "uid": "prometheus"
+                    }
+                }
+            ]
+        }
+    ],
+    "time": {
+        "from": "now-6h",
+        "to": "now"
+    },
+    "timepicker": {},
+    "refresh": "5s",
+    "schemaVersion": 39,
+    "version": 1
+}

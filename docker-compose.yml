@@ -1,0 +1,47 @@
+services:
+  order-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5288:80" # Expose API
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - prometheus # Optional: For metrics
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/alerting-rules.yml:/etc/prometheus/rules/alerting-rules.yml # Alerting
+    ports:
+      - "9090:9090"
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--storage.tsdb.retention.time=200h"
+      - "--web.enable-lifecycle"
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./monitoring/alertmanager:/etc/alertmanager
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin # Change in prod
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./monitoring/provisioning:/etc/grafana/provisioning # Auto-provision datasource/dashboard
+    depends_on:
+      - prometheus

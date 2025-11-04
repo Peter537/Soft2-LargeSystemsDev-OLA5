@@ -1,0 +1,20 @@
+groups:
+  - name: sla_alerts
+    rules:
+      - alert: HighOrderLatency
+        expr: histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{job="order-service"}[5m])) by (le)) > 5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Order visibility latency high (SLO breach)"
+          description: "99th percentile >5s for order-service; investigate downstream latency or load."
+
+      - alert: UptimeLow
+        expr: up{job="order-service"} == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "OrderService down (uptime SLO breach)"
+          description: "Prometheus 'up' metric reports order-service is down for >5m."

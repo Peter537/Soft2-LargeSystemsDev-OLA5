@@ -8,7 +8,7 @@
 
 ## SLA
 
-Vores SLA kan findes i [SLA.md](./SLA.md), hvor vi har defineret et par SLO'er for virksomheden.
+Vores SLA kan findes i [SLA.md](./SLA.md), hvor vi har defineret et par SLO'er for MToGo.
 
 ## Kørsel af programmet og dokumentation
 
@@ -44,7 +44,7 @@ Billede af hvordan det skal se ud på Postman:
 
 3. **Tjek Prometheus Metrics for at alt er korrekt**
 
-Derefter kan man lige tjekke Prometheus' metrics-endpoint på Service-URL'en for at tjekke der connection med Prometheus på servicen.
+Derefter kan man tjekke Prometheus' metrics-endpoint på Service-URL'en for at se om der er et værdifuldt output. Heraf om outputtet følger Prometheus formatet.
 
 I dette tilfælde er det på: http://localhost:5288/metrics
 
@@ -68,13 +68,15 @@ Der er to muligheder at oprette dashboards på.
 
 Først og fremmest skal man ind på http://localhost:3000/dashboards, hvorefter man klikker på `Create Dashboard`.
 
-Første mulighed er at man derefter trykker på `Add visualization`, vælger sin datasource derefter, og så kan man vælge en metric i `Select metric` der skal vises.
+### Første mulighed
+Man trykker på `Add visualization`, vælger sin datasource derefter, og så kan man vælge en metric i `Select metric` der skal vises.
 
 Eksempel på dette er vores `order_placed_total`:
 
 ![alt text](./img/grafana-dashboard-website.png)
 
-Den anden mulighed er at man også er inde på Create Dashboard, hvor at man så i stedet trykker på `Important a dashboard`, hvor man skal indsætte JSON fra f.eks. [monitoring/sla-dashboard.json](./monitoring/sla-dashboard.json) som tilføjer et pre-defined dashboard ind på Grafana.
+### Den anden mulighed
+I stedet for at oprette et dashboard manuelt, trykker man på `Import a dashboard`, hvor man skal indsætte JSON fra f.eks. [monitoring/sla-dashboard.json](./monitoring/sla-dashboard.json) som tilføjer et pre-defined dashboard ind på Grafana.
 
 Et eksempel på dette er hvor vi viser total update procent, hvor vi startede med at have den på 100% fordi den var aktiv, så stoppede vi servicen hvor det gik ned, så var den stabil over lang tid fordi ingen Docker containeren var aktive (så ingen metrics bliver talt), og så blev den startet og er på vej op ad nu:
 

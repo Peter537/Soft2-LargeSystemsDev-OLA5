@@ -75,7 +75,7 @@ Eksempel på dette er vores `order_placed_total`:
 
 ![alt text](./img/grafana-dashboard-website.png)
 
-### Den anden mulighed
+### Anden mulighed
 I stedet for at oprette et dashboard manuelt, trykker man på `Import a dashboard`, hvor man skal indsætte JSON fra f.eks. [monitoring/sla-dashboard.json](./monitoring/sla-dashboard.json) som tilføjer et pre-defined dashboard ind på Grafana.
 
 Et eksempel på dette er hvor vi viser total update procent, hvor vi startede med at have den på 100% fordi den var aktiv, så stoppede vi servicen hvor det gik ned, så var den stabil over lang tid fordi ingen Docker containeren var aktive (så ingen metrics bliver talt), og så blev den startet og er på vej op ad nu:

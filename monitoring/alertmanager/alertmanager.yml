@@ -1,8 +1,29 @@
+# Global settings for alert resolution.
 global:
-  resolve_timeout: 5m
+  resolve_timeout: 5m # Time after which an alert is considered resolved if not firing.
 
+# Template files for custom notification formatting.
+templates:
+  - /etc/alertmanager/templates/discord.tmpl # Loads the new Discord template file.
+
+# Root routing tree for alerts.
 route:
-  receiver: "null"
+  group_by: # Labels to group alerts by, reducing notification spam.
+    - job
+    - alertname
+  group_wait: 30s # Wait time for initial group formation.
+  group_interval: 5m # Interval between notifications for the same group.
+  repeat_interval: 1h # Minimum wait before re-sending the same alert.
+  receiver: null-receiver # Default receiver (assuming original has a null or similar; replace if needed).
+  routes: # Child routes for specific matching.
+    - receiver: discord-proxy # Route high-severity alerts to Discord.
+      matchers:
+        - severity =~ "warning|critical" # Match alerts with warning or critical severity.
 
+# Defined receivers for notifications.
 receivers:
-  - name: "null"
+  - name: null-receiver # Placeholder receiver that discards alerts (common default; retain or merge from original).
+  - name: discord-proxy # New receiver for Discord notifications.
+    webhook_configs:
+      - url: "http://discord-proxy:3000/alert" # internal service URL, must include scheme
+        send_resolved: true

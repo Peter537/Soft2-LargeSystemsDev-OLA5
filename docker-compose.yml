@@ -9,6 +9,8 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
       - prometheus # Optional: For metrics
+    networks:
+      - monitoring
 
   prometheus:
     image: prom/prometheus:latest
@@ -24,6 +26,8 @@ services:
       - "--web.console.templates=/etc/prometheus/consoles"
       - "--storage.tsdb.retention.time=200h"
       - "--web.enable-lifecycle"
+    networks:
+      - monitoring
 
   alertmanager:
     image: prom/alertmanager:v0.29.0
@@ -32,8 +36,11 @@ services:
       - "9093:9093"
     volumes:
       - ./monitoring/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - ./monitoring/alertmanager/templates:/etc/alertmanager/templates:ro   # <-- mount templates
     command:
       - '--config.file=/etc/alertmanager/alertmanager.yml'
+    environment:
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL} # Set in .env
     networks:
       - monitoring
 
@@ -48,6 +55,19 @@ services:
       - ./monitoring/provisioning:/etc/grafana/provisioning # Auto-provision datasource/dashboard
     depends_on:
       - prometheus
+    networks:
+      - monitoring
+
+  discord-proxy:
+    build:
+      context: ./monitoring/alertmanager/discord-proxy
+      dockerfile: Dockerfile
+    environment:
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
+    networks:
+      - monitoring
+    ports:
+      - "3001:3000"
 
 networks:
   monitoring:

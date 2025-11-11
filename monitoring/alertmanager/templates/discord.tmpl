@@ -1,0 +1,6 @@
+{{ define "discord.default.title" }}{{ .CommonLabels.alertname }} — {{ .Status }}{{ end }}
+{{ define "discord.default.message" }}
+{{ range .Alerts }}
+- {{ .Labels.alertname }}: {{ .Annotations.summary }} (severity={{ .Labels.severity }})
+{{ end }}
+{{ end }}
